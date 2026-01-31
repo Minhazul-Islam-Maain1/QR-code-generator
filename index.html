@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Reset */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #DFF6FF, #E0F7FA);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      flex-direction:column;
+      padding:20px;
+    }
+
+    h1 {
+      font-size:2rem;
+      margin-bottom:20px;
+      color:#333;
+      text-align:center;
+      opacity:0;
+      transform:translateY(-20px);
+      animation:fadeIn 1s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    .container {
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-radius:20px;
+      padding:30px;
+      max-width:400px;
+      width:100%;
+      box-shadow:0 8px 25px rgba(0,0,0,0.2);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:15px;
+      animation:fadeIn 1s forwards 0.3s;
+    }
+
+    input, select, button {
+      width:100%;
+      padding:10px 15px;
+      border-radius:10px;
+      border:none;
+      font-size:1rem;
+      outline:none;
+      transition:transform 0.2s;
+    }
+
+    input:focus, select:focus { transform:scale(1.02); }
+    button:hover { transform:scale(1.05); cursor:pointer; }
+
+    button {
+      background:#FEC5BB;
+      color:#333;
+      font-weight:600;
+      border:none;
+      margin-top:10px;
+    }
+
+    #qrcode {
+      margin-top:20px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      opacity:0;
+      transform:translateY(20px);
+      transition:opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    /* Label styles */
+    label {
+      font-size:0.9rem;
+      color:#555;
+      align-self:flex-start;
+    }
+
+    .flex-row {
+      display:flex;
+      gap:10px;
+      width:100%;
+    }
+
+    .flex-row input, .flex-row select { flex:1; }
+  </style>
+</head>
+<body>
+
+<h1>QR Code Generator</h1>
+
+<div class="container">
+  <label for="text">Enter Text or URL:</label>
+  <input type="text" id="text" placeholder="https://example.com">
+
+  <div class="flex-row">
+    <div>
+      <label for="dotShape">Dot Shape:</label>
+      <select id="dotShape">
+        <option value="square">Square</option>
+        <option value="circle">Circle</option>
+        <option value="rounded">Rounded</option>
+      </select>
+    </div>
+    <div>
+      <label for="fgColor">Dot Color:</label>
+      <input type="color" id="fgColor" value="#000000">
+    </div>
+  </div>
+
+  <label for="bgColor">Background Color:</label>
+  <input type="color" id="bgColor" value="#ffffff">
+
+  <button id="generate">Generate QR Code</button>
+  <button id="download">Download QR Code</button>
+
+  <div id="qrcode"></div>
+</div>
+
+<!-- QR Code Styling Library -->
+<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+<script>
+  const qrDiv = document.getElementById('qrcode');
+  let qrCode = new QRCodeStyling({
+    width: 250,
+    height: 250,
+    data: "https://example.com",
+    image: "",
+    dotsOptions: { color: "#000", type: "square" },
+    backgroundOptions: { color: "#fff" },
+  });
+
+  document.getElementById('generate').addEventListener('click', () => {
+    const text = document.getElementById('text').value.trim();
+    if(!text) return alert("Please enter text or URL");
+
+    const dotShape = document.getElementById('dotShape').value;
+    const fgColor = document.getElementById('fgColor').value;
+    const bgColor = document.getElementById('bgColor').value;
+
+    qrCode = new QRCodeStyling({
+      width: 250,
+      height: 250,
+      data: text,
+      dotsOptions: { color: fgColor, type: dotShape },
+      backgroundOptions: { color: bgColor },
+      imageOptions: { crossOrigin: "anonymous", margin: 0 },
+    });
+
+    qrDiv.innerHTML = "";
+    qrCode.append(qrDiv);
+    qrDiv.style.opacity = 1;
+    qrDiv.style.transform = "translateY(0)";
+  });
+
+  document.getElementById('download').addEventListener('click', () => {
+    if(!qrCode) return;
+    qrCode.download({ name: "qr_code", extension: "png" });
+  });
+</script>
+
+</body>
+</html>
